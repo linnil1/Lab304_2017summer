@@ -1,4 +1,6 @@
-# lab02 HW
+# lab02_HW
+Work at ubuntu16.04 + Matlab R0217a academic use
+---
 1. Identify what is wrong with the following MATLAB command sequences and/or answers.
 
     (i)
@@ -9,7 +11,7 @@
     Wrong
     Assignment should contain only one variable
     ``` matlab
-    y = x + 1
+    >> y = x + 1
     y =
      1     2     3     4     5     6     7     8     9    10    11
      ```
@@ -31,7 +33,7 @@
     ans = 0
     ```
     Wrong
-    Matlab is start at 1 
+    Matlab index is start at 1 
     ``` matlab
     >> B(1)
     ans = 0
@@ -56,7 +58,7 @@
     Wrong. Dimension error 
     It should be same dimentsion
     ``` matlab
-    >> A*B'
+    >> A * B'
     ans = 98
     ```
 2. Make the following variables:
@@ -194,33 +196,68 @@ val =
 4. An M-by-M matrix X is given. Without using loops, extract values from matrix X to create the following:
 Let's set 
     ``` matlab
-    >> X = reshape(1:81, 9, 9) % use this to check answer
     >> n = 9;
+    >> X = reshape(1:n^2, n, n) % use this to check answer
+    X =
+     1    10    19    28    37    46    55    64    73
+     2    11    20    29    38    47    56    65    74
+     3    12    21    30    39    48    57    66    75
+     4    13    22    31    40    49    58    67    76
+     5    14    23    32    41    50    59    68    77
+     6    15    24    33    42    51    60    69    78
+     7    16    25    34    43    52    61    70    79
+     8    17    26    35    44    53    62    71    80
+     9    18    27    36    45    54    63    72    81
+
     ```
 
     i) matrix A – composed of all values in odd columns AND odd rows
     ``` matlab
     >> X(1:2:n, 1:2:n)
+    ans =
+     1    19    37    55    73
+     3    21    39    57    75
+     5    23    41    59    77
+     7    25    43    61    79
+     9    27    45    63    81
     ```
     ii) matrix B – composed of all entries of X, except for the outside rows and columns
     ``` matlab
     >> X(2:n-1, 2:n-1)
+    ans =
+    11    20    29    38    47    56    65
+    12    21    30    39    48    57    66
+    13    22    31    40    49    58    67
+    14    23    32    41    50    59    68
+    15    24    33    42    51    60    69
+    16    25    34    43    52    61    70
+    17    26    35    44    53    62    71
     ```
     iii) matrix C – composed of diagonals surrounding the middle diagonal of matrix X
     ![](https://i.imgur.com/av3V0ai.png)
     ``` matlab
-    >> X .* (diag(ones(1, 8), 1) + diag(ones(1, 8), -1))
+    >> X .* (diag(ones(1, n - 1), 1) + diag(ones(1, n - 1), -1))
+    ans =
+     0    10     0     0     0     0     0     0     0
+     2     0    20     0     0     0     0     0     0
+     0    12     0    30     0     0     0     0     0
+     0     0    22     0    40     0     0     0     0
+     0     0     0    32     0    50     0     0     0
+     0     0     0     0    42     0    60     0     0
+     0     0     0     0     0    52     0    70     0
+     0     0     0     0     0     0    62     0    80
+     0     0     0     0     0     0     0    72     0
     ```
 5. Without using loops, calculate the sum of the following series
 1 - 1/2 + 1/3 - 1/4 + 1/5 ...
 for the first 10,000 terms.
     We can do it for only one line
     ``` matlab
-    >> sum([arrayfun(@(x)1/x, [1:2:10000]) , arrayfun(@(x)-1/x, [2:2:10000])])
+    >> sum([arrayfun(@(x) 1 / x - 1/(x + 1), [1:2:10000])])
     ans =
     0.6931
     ```
-    The answer is same as `ln(2)`
+    The answer is same as `ln(2)` in Math
     
 6. (1) Load the image 02Lena.bmp by typing:
     `A = imread('02Lena.png');`
@@ -231,18 +268,18 @@ for the first 10,000 terms.
     ans =
     'uint8'
     ```
-
+    so it is a matrix of uint8
     (2) Display the image by typing:
     `imshow(A);`
     Now multiply the entries of A to 1.5. Display the image and report what you observe.
     ``` matlab
-    >> subplot(1,2,1)
-    >> title("Original")
-    >> imshow(A)
-    >> title("Original")
-    >> subplot(1,2,2)
-    >> imshow(A * 1.5)
-    >> title("Original * 1.5")
+    >> subplot(1, 2, 1);
+    >> title("Original");
+    >> imshow(A);
+    >> title("Original");
+    >> subplot(1, 2, 2);
+    >> imshow(A * 1.5);
+    >> title("Original * 1.5");
     ```
     And you will notice that multiply 1.5 will be brighter
     ![](https://i.imgur.com/bkYiKfH.jpg)
