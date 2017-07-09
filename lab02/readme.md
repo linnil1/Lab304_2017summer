@@ -7,7 +7,3 @@ or Download and read
 * PDF
 
     lab02_HW.pdf
-
-* By web
-
-    lab02_HW.html
