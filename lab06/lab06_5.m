@@ -17,6 +17,8 @@ function lab06_5()
     title('Scatter Plot');
     xlabel('PC1');
     ylabel('PC2');
+    xlim([-400 400]);
+    ylim([-400 400]);
     legend({'c/c', 'C/c', 'C/C'}, 'Position', [.05 .05 .15 .15]);
 
     % right bottom histogram
