@@ -4,8 +4,18 @@
 
     [https://hackmd.io/s/BJ6YPXcSW](https://hackmd.io/s/BJ6YPXcSW)
 
-or Download and read
+* offline PDF
 
-* PDF
+    [lab07_HW.pdf](https://github.com/linnil1/Lab304_2017summer/blob/master/lab07/lab07_HW.pdf)
 
-    lab07_HW.pdf
+* offline markdown
+
+    [lab07_HW.md](https://github.com/linnil1/Lab304_2017summer/blob/master/lab07/lab07_HW.md)
+
+* Question PDF
+
+    [07Lab.pdf](https://github.com/linnil1/Lab304_2017summer/blob/master/lab07/07lab.pdf)
+
+* All data
+
+    [lab07_folder](https://github.com/linnil1/Lab304_2017summer/tree/master/lab07)
