@@ -14,7 +14,7 @@
 
 * Question PDF
 
-    [08Lab.pdf](https://github.com/linnil1/Lab304_2017summer/blob/master/lab08/08lab.pdf)
+    [08Lab.pdf](https://github.com/linnil1/Lab304_2017summer/blob/master/lab08/08Lab.pdf)
 
 * All data
 
