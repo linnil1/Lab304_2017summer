@@ -1,66 +1,97 @@
-% load and make it to binary
-img = imread('10Fingerprint.tif');
-bwimg = ~imbinarize(img);
-% er = imerode(bwimg, strel('disk', 1));
-% di = imdilate(di, strel('line', 4,45));
-% avgimg = imfilter(avgimg, fspecial('average'))
+function fingerprint_cleaner(fig)
+    % load and make it to binary
+    img = imread(fig);
+    bwimg = ~imbinarize(img);
 
-% remove small connect dot on each line
-nobimg = ~bwimg;
-for i = 1:2
-    nobimg = bwareaopen(nobimg, 15, 4);
+    % remove small dot on each line
+    nobimg = ~bwimg;
+    for i = 1:2
+        nobimg = bwareaopen(nobimg, 15, 4);
+    end
+    nobimg = ~nobimg;
+
+    % get skeletion and remove skeleton edge
+    skelimg = bwmorph(nobimg, 'skel', Inf);
+
+    % remove T shape that will confuse other branch function
+    interval = [ 0  1  0
+                 1  1  0
+                 0  1  0];
+    cutskelimg = skelimg;
+    for ang = 0:90:270
+        cutskelimg = cutskelimg - bwhitmiss(cutskelimg, imrotate(interval,  ang));
+    end
+
+    % remove branch
+    nobrimg = cutskelimg;
+    nobrimg = cutBranch(nobrimg);
+    nobrimg = cutBranch(nobrimg);
+    % closing back the remove some crook point
+    nobrskelimg = bwmorph(nobrimg, 'skel', Inf);
+    nobrskelimg = bwmorph(bwmorph(nobrskelimg, 'diag'), 'skel', Inf);
+
+    % remove bridge
+    nobgimg = nobrskelimg;
+    nobgimg = cutBridge(nobgimg);
+    % after remove bridge, remove branch again
+    nobgbrimg = cutBranch(nobgimg);
+    nobgbrimg = cutBranch(nobgbrimg);
+    nobgskelimg = bwmorph(nobgbrimg, 'skel', Inf);
+    nobgskelimg = bwmorph(bwmorph(nobgskelimg, 'diag'), 'skel', Inf);
+
+    % connect
+    conimg = bwmorph(nobgskelimg, 'bridge');
+    conimg = bwmorph(conimg, 'skel', Inf);
+    conimg = bwmorph(bwmorph(conimg, 'diag'), 'skel', Inf);
+
+    % show image
+    imshow(img);
+    % imshow(conimg);
+    hold on
+    [y, x] = find(bwmorph(conimg, 'branchpoints'));
+    plot(x, y, 'ro', 'MarkerSize', 10);
+    [y, x] = find(bwmorph(conimg, 'endpoints'));
+    plot(x, y, 'bo', 'MarkerSize', 10);
+    hold off
+    % showImage(nobrskelimg, nobgskelimg);
 end
-nobimg = ~nobimg;
-
-% erosion and remove H-bridge to remove pixel between each line
-eroimg = imerode(nobimg, strel('disk', 1));
-eroimg = bwareaopen(eroimg, 10, 4);
-eroimg = imdilate(eroimg, strel('disk', 1));
-
-% get skeletion and remove skeleton edge
-skelimg = bwmorph(eroimg,'skel', Inf);
-cutskelimg = skelimg;
-cutskelimg = bwmorph(skelimg, 'diag');
-cutskelimg = bwmorph(cutskelimg, 'spur', 10);
-cutskelimg = bwmorph(cutskelimg, 'skel', Inf);
-% two below line will cause the image no good
-cutskelimg = bwmorph(cutskelimg, 'spur', 3);
-cutskelimg = bwmorph(cutskelimg, 'skel', Inf);
-
-% remove L shape that will confuse other branch function
-interval = [-1  1  0
-             1  1 -1
-             0 -1 -1];
-noLimg = cutskelimg;
-for ang = 0:90:270
-    noLimg = noLimg - bwhitmiss(noLimg, imrotate(interval,  ang));
-end
-
-nobgimg = noLimg;
-nobgimg = cutBridge(nobgimg);
-nobgimg = cutBridge(nobgimg);
-% remove L shape again
-noLbgimg = nobgimg;
-for ang = 0:90:270
-    noLbgimg = noLbgimg - bwhitmiss(noLbgimg, imrotate(interval,  ang));
-end
-
-imshow(img);
-ends = bwmorph(noLbgimg, 'endpoints');
-branchs = bwmorph(noLbgimg, 'branchpoints');
-hold on
-[y, x] = find(branchs);
-plot(x, y, 'ro', 'MarkerSize', 15);
-[y, x] = find(ends);
-plot(x, y, 'bo', 'MarkerSize', 15);
-hold off
-% showImage(bwimg, noLbgimg);
 
 function showImage(oriimg, nowimg)
     all = double(oriimg);
     all = cat(3, all, all, all);
     want = cat(3, double(nowimg), zeros(size(oriimg)), zeros(size(oriimg)));
     imshow(imlincomb(0.5, all, 0.5, want));
+end
+
+function nobrimg = cutBranch(nobrimg)
+    branchs = bwmorph(nobrimg, 'branchpoints');
+    ends    = bwmorph(nobrimg, 'endpoints');
+    [by, bx] = find(branchs);
+    [ey, ex] = find(ends);
+    tmpbgimg = nobrimg;
+    % remove branch point
+    for b = 1:length(bx)
+        tmpbgimg(by(b)-1:by(b)+1, bx(b)-1:bx(b)+1) = 0;
+    end
+    tmplbimg = bwlabel(tmpbgimg);
+
+    % remove small branch
+    brimg = zeros(size(nobrimg), 'logical');
+    for e = 1:length(ex)
+        if tmplbimg(ey(e), ex(e)) && ...
+           nnz(tmplbimg == tmplbimg(ey(e), ex(e))) > 3
+            continue
+        end
+        if tmplbimg(ey(e), ex(e))
+            brimg = brimg | (tmplbimg == tmplbimg(ey(e), ex(e)));
+        else
+            brimg(ey(e), ex(e)) = 1;
+        end
+    end
+    
+    % dilate and remove it
+    brimg = nobrimg & imdilate(brimg, strel('disk', 1));
+    nobrimg = nobrimg - brimg;
 end
 
 function nobgimg = cutBridge(nobgimg)
@@ -82,7 +113,9 @@ function nobgimg = cutBridge(nobgimg)
         mid  = tmplbimg(midy-1:midy+1, midx-1:midx+1);
         mid  = mode(mid(mid>0));
         % disp(mid);
-        if nnz(tmplbimg == mid) < 20
+        if isnan(mid)
+            bgimg(midy, midx) = 1;
+        elseif nnz(tmplbimg == mid) < 7
             bgimg = bgimg + (tmplbimg == mid);
         end
     end
@@ -98,7 +131,7 @@ function pair = getBridgepair(bdimg)
     counts = cell(1, length(x));
     for i = 1:length(x)
         dis = (y - y(i)) .^ 2 + (x - x(i)) .^ 2;
-        near = find(dis > 16 & dis < 100);
+        near = find(dis > 3 & dis < 100);
         if ~isempty(near)
             for n = 1:length(near)
                 counts{near(n)}(end + 1) = i;

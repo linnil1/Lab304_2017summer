@@ -43,6 +43,9 @@
 > but this function has some disadvantage
 > ## remove error branch
 > we need to remove some bad branch on it
+> however you should not use `shrink`
+> it will remove this feature
+> ![](https://i.imgur.com/ZOTEOdD.png)
 > ``` matlab
 > cutskelimg = bwmorph(skelimg, 'diag');
 > cutskelimg = bwmorph(cutskelimg, 'spur', 10);
@@ -117,6 +120,59 @@
 > hold off
 > ```
 > ![](https://i.imgur.com/7bCZBdy.png)
+> # update 7/29
+> ## remove branch very carefully
+> I found that skeleton algorithm is very powerful
+> use it with a little pre-process is enough
+> methods same to remove bridge writing above
+> if endpoint is too close to brnach point, remove it
+> * pre-process
+> ```  matlab
+> img = imread('10Fingerprint.tif');
+> bwimg = ~imbinarize(img);
+> nobimg = ~bwimg;
+> for i = 1:2
+>     nobimg = bwareaopen(nobimg, 15, 4);
+> end
+> nobimg = ~nobimg;
+> skelimg = bwmorph(nobimg, 'skel', Inf);
+> ```
+> * remove branch
+> same method described before
+> ``` matlab
+> nobrimg = cutskelimg;
+> nobrimg = cutBranch(nobrimg);
+> nobrimg = cutBranch(nobrimg);
+> nobrskelimg = bwmorph(nobrimg, 'skel', Inf);
+> nobrskelimg = bwmorph(bwmorph(nobrskelimg, 'diag'), 'skel', Inf);
+> ```
+> see `fingerprint_cleaner#cutBranch`
+> ![](https://i.imgur.com/VtCS5Lr.png)
+> * remove bridge
+> after remove bridge, remove branch
+> ``` matlab
+> nobgimg = nobrskelimg;
+> nobgimg = cutBridge(nobgimg);
+> nobgbrimg = cutBranch(nobgimg);
+> nobgbrimg = cutBranch(nobgbrimg);
+> nobgskelimg = bwmorph(nobgbrimg, 'skel', Inf);
+> nobgskelimg = bwmorph(bwmorph(nobgskelimg, 'diag'), 'skel', Inf);
+> ```
+> * connect if I acciendenitly break line
+> `conimg = bwmorph(nobgskelimg, 'bridge');`
+> ## perfect
+> now it is really perfect
+> ![](https://i.imgur.com/RE9KL9l.png)
+> ![](https://i.imgur.com/zplUUtQ.png)
+> see this no bridge
+> this bridge is caused by bad pre-processing or
+> the data is not very clean enough
+> ![](https://i.imgur.com/F7i3ShC.png)
+> # code
+> see `fingerprint_cleaner.m`
+> `>> fingerprint_cleaner('10Fingerprint.tif');`
+> ![](https://github.com/linnil1/Lab304_2017summer/blob/master/lab10/fingerprint_clean.jpg)
+
 
 
 
