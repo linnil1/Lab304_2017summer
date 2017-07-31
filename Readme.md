@@ -12,4 +12,5 @@
 | lab09 | [https://hackmd.io/s/r1HKmk0Bb](https://hackmd.io/s/r1HKmk0Bb) |
 | lab10 | [https://hackmd.io/s/BkpafrzLb](https://hackmd.io/s/BkpafrzLb) |
 | lab11 | [https://hackmd.io/s/HJWcCfqIZ](https://hackmd.io/s/HJWcCfqIZ) |
+| lab12 | [https://hackmd.io/s/Hk48_r38b](https://hackmd.io/s/Hk48_r38b) |
 
