@@ -7,7 +7,7 @@ function lab06_1()
          'linewidth', 2);
     xlim([0 25]);
     hold off;
-    title("Lab06 Problem1");
+    title('Lab06 Problem1');
     
 
 end

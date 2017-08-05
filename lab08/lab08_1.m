@@ -66,7 +66,7 @@ function handles = imgInit(handles, filepath)
     handles.img = imread(filepath);
     handles.nowimg = handles.img;
     handles.imageSize.String = sprintf('%s\n%s', ...
-        "Image Size:", num2str(size(handles.img)));
+        'Image Size:', num2str(size(handles.img)));
     imgDraw(handles);
     
     

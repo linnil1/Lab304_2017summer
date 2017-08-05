@@ -1,6 +1,6 @@
 function lab06_5()
     % init
-    dat = xlsread("06Scatter.xlsx");
+    dat = xlsread('06Scatter.xlsx');
     c1 = dat(dat(:, 3) == 0, [1 2]);
     c2 = dat(dat(:, 3) == 1, [1 2]);
     c3 = dat(dat(:, 3) == 2, [1 2]);
@@ -26,16 +26,16 @@ function lab06_5()
     plotHistogram(c1, c2, c3, 2, @barh);
     xlim([0, 10]);
     ylim([-400 400]);
-    ylabel("PC2");
-    xlabel("Frequency");
+    ylabel('PC2');
+    xlabel('Frequency');
 
     % left top histogram
     subplot('Position', [.3 .05 .65 .15]);
     plotHistogram(c1, c2, c3, 1, @bar);
     ylim([0, 10]);
     xlim([-400 400]);
-    xlabel("PC1");
-    ylabel("Frequency");
+    xlabel('PC1');
+    ylabel('Frequency');
 end
 
 % histogram to bar

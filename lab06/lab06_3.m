@@ -1,5 +1,5 @@
 function lab06_3()
-    gas = load("06Gas.mat");
+    gas = load('06Gas.mat');
     figure('position', [0, 0, 1000, 700]);
 
     subplot(3, 1, 1);
