@@ -27,13 +27,12 @@ end
 color_size = 600;
 color_pos = pointGet(color_size, img_size);
 
-q = zeros(size(allpos)); %test
+% q = zeros(size(allpos)); %test
 
-% function
 % background
 [all_x, all_y] = find(allpos);
 three_label = kmeans([all_x all_y], 3);
-q(find(allpos)) = three_label; %test
+% q(find(allpos)) = three_label; %test
 
 back_pos = [];
 back_size = 400;
@@ -46,6 +45,7 @@ end
 figure;
 imshow((q+1)/4);
 
+% functions
 
 function pos = pointGet(s, img_size)
     pos = ginput(1);
