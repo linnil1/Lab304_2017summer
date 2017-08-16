@@ -22,7 +22,7 @@ function varargout = FishCut_GUI(varargin)
 
 % Edit the above text to modify the response to help FishCut_GUI
 
-% Last Modified by GUIDE v2.5 13-Aug-2017 11:22:12
+% Last Modified by GUIDE v2.5 16-Aug-2017 14:17:19
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -123,9 +123,13 @@ if handles.step == 0
         disp('No more');
         return
     end
+    disp(handles.oriname);
     handles.img = imread([handles.path 'ori/' handles.oriname]);
     handles.name = handles.oriname(1:end-4);
     handles.img_size = size(handles.img);
+    handles.slider_now.Max = round(min(handles.img_size(1:2)) / 2);
+    handles.slider_now.Min = round(min(handles.img_size(1:2)) / 20);
+    handles.slightMove = round(min(handles.img_size(1:2)) / 75);
     handles.poss = [];
     
     % head input
@@ -180,7 +184,7 @@ elseif handles.step >= 3 && handles.step <= 4
                          handles.body_size(handles.step - 2));
     pointDraw(handles.pos, handles.size);
 
- elseif handles.step == 5
+elseif handles.step == 5
     % body save
     handles.body_size(handles.step - 2) = handles.size;
     handles.body_pos(handles.step - 2, :) = handles.pos;
@@ -207,10 +211,14 @@ elseif handles.step == 6
     [all_x, all_y] = find(allpos);
     three_label = kmeans([all_x all_y], 3);
     handles.back_pos = [];
-    handles.back_size = repmat([round(max(handles.img_size)/10)], 1, 3);
+    s = round(max(handles.img_size)/10);
+    handles.back_size = repmat([s], 1, 3);
 
     for i = 1:3
         back_pos = [mean(all_x(three_label == i)) mean(all_y(three_label == i))] * 10;
+        for j = 1:length(handles.poss)
+            back_pos = noOver(handles.poss(j, 1:2), handles.poss(j, 3), back_pos, s);
+        end
         handles.back_pos(i, :) = pointModify(back_pos, handles.back_size(i), handles.img_size);
     end
     handles.step = 7;
@@ -251,9 +259,12 @@ elseif  handles.step == 9
     end
     movefile([handles.path 'ori/' handles.oriname], [handles.path 'ok/' handles.name '_ori.jpg']);
     disp('OK');
-    handles.step = 0;
+    handles.step = 0; % for new one
+    ok_Callback(hObject, eventdata, handles);
 end
-guidata(hObject, handles);
+if handles.step > 0 
+    guidata(hObject, handles);
+end
 
 % functions
 function showAll(handles)
@@ -295,7 +306,28 @@ function pointSave(pos, size, img, name)
     size = uint64(size);
     imwrite(img(pos(2)-size:pos(2)+size, pos(1)-size:pos(1)+size, :), name);
 
-
+ % a is fix and b need to move and return b position
+function pos = noOver(a_pos, a_size, b_pos, b_size)
+    s = a_size + b_size;
+    pos = b_pos;
+    if abs(a_pos(1) - b_pos(1)) < s
+        if a_pos(1) < b_pos(1)
+            pos(1) = a_pos(1)+s;
+        else
+            pos(1) = a_pos(1)-s;
+        end
+    end
+    if abs(a_pos(2) - b_pos(2)) < s
+        if a_pos(2) < b_pos(2)
+            pos(2) = a_pos(2)+s;
+        else
+            pos(2) = a_pos(2)-s;
+        end
+    end
+            
+    
+% up down left right
+    
 % --- Executes on button press in pushbutton3.
 function pushbutton3_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton3 (see GCBO)
@@ -309,7 +341,7 @@ function push_down_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 showAll(handles)
-handles.pos(2) = handles.pos(2) + 50;
+handles.pos(2) = handles.pos(2) + handles.slightMove;
 handles.pos = pointModify(handles.pos, handles.size, handles.img_size);
 pointDraw(handles.pos, handles.size);
 guidata(hObject, handles);
@@ -320,7 +352,7 @@ function push_right_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 showAll(handles)
-handles.pos(1) = handles.pos(1) + 50;
+handles.pos(1) = handles.pos(1) + handles.slightMove;
 handles.pos = pointModify(handles.pos, handles.size, handles.img_size);
 pointDraw(handles.pos, handles.size);
 guidata(hObject, handles);
@@ -332,7 +364,7 @@ function push_up_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 showAll(handles)
-handles.pos(2) = handles.pos(2) - 50;
+handles.pos(2) = handles.pos(2) - handles.slightMove;
 handles.pos = pointModify(handles.pos, handles.size, handles.img_size);
 pointDraw(handles.pos, handles.size);
 guidata(hObject, handles);
@@ -343,7 +375,16 @@ function push_left_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 showAll(handles)
-handles.pos(1) = handles.pos(1) - 50;
+handles.pos(1) = handles.pos(1) - handles.slightMove;
 handles.pos = pointModify(handles.pos, handles.size, handles.img_size);
 pointDraw(handles.pos, handles.size);
 guidata(hObject, handles);
+
+
+% --- Executes on button press in push_redo.
+function push_redo_Callback(hObject, eventdata, handles)
+% hObject    handle to push_redo (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+handles.step = 0;
+ok_Callback(hObject, eventdata, handles);
