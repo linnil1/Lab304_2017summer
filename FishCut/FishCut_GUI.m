@@ -310,18 +310,20 @@ function pointSave(pos, size, img, name)
 function pos = noOver(a_pos, a_size, b_pos, b_size)
     s = a_size + b_size;
     pos = b_pos;
-    if abs(a_pos(1) - b_pos(1)) < s
-        if a_pos(1) < b_pos(1)
-            pos(1) = a_pos(1)+s;
-        else
-            pos(1) = a_pos(1)-s;
+    if abs(a_pos(1) - b_pos(1)) < s && abs(a_pos(2) - b_pos(2)) < s
+        if abs(a_pos(1) - b_pos(1)) < s
+            if a_pos(1) < b_pos(1)
+                pos(1) = a_pos(1)+s;
+            else
+                pos(1) = a_pos(1)-s;
+            end
         end
-    end
-    if abs(a_pos(2) - b_pos(2)) < s
-        if a_pos(2) < b_pos(2)
-            pos(2) = a_pos(2)+s;
-        else
-            pos(2) = a_pos(2)-s;
+        if abs(a_pos(2) - b_pos(2)) < s
+            if a_pos(2) < b_pos(2)
+                pos(2) = a_pos(2)+s;
+            else
+                pos(2) = a_pos(2)-s;
+            end
         end
     end
             
